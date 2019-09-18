@@ -18,8 +18,8 @@ class UI {
       <td>${txn.type}</td>
       <td>${txn.desc}</td>
       <td>${txn.amt}</td>
-      <td><a href="#" class="edit" data-id="${txn.id}">E<a></td>
-      <td><a href="#" class="delete" data-id="${txn.id}">X<a></td>
+      <td><a href="#" class="edit-txn" data-id="${txn.id}"><i class="fas fa-edit"></i><a></td>
+      <td><a href="#" class="delete-txn" data-id="${txn.id}"><i class="fas fa-trash"></i><a></td>
     `;
 
     list.appendChild(row);
@@ -46,13 +46,13 @@ class UI {
   }
 
   static deleteTxn(target) {
-    if (target.className === 'delete') {
+    if (target.className === 'delete-txn') {
       target.parentElement.parentElement.remove();
     }
   }
 
   static editTxn(target) {
-    if (target.className === 'edit') {
+    if (target.className === 'edit-txn') {
       target.parentElement.parentElement.remove();
     }
   }
@@ -159,18 +159,18 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
 
 // Event Listener for delete
 document.getElementById('txn-list').addEventListener('click', function(e) {
-  if (e.target.classList.contains('edit')) {
+  if (e.target.parentElement.classList.contains('edit-txn')) {
     const txns = Store.getTxns();
-    const txn = txns.filter(t => t.id === parseInt(e.target.dataset.id));
+    const txn = txns.filter(t => t.id === parseInt(e.target.parentElement.dataset.id));
     // Fill the form with saved values
     document.getElementById('type').value = txn[0].type;
     document.getElementById('desc').value = txn[0].desc;
     document.getElementById('amt').value = txn[0].amt;
-    Store.removeTxn(parseInt(e.target.dataset.id));
-    UI.editTxn(e.target);
-  } else if (e.target.classList.contains('delete')) {
-    Store.removeTxn(parseInt(e.target.dataset.id));
-    UI.deleteTxn(e.target);
+    Store.removeTxn(parseInt(e.target.parentElement.dataset.id));
+    UI.editTxn(e.target.parentElement);
+  } else if (e.target.parentElement.classList.contains('delete-txn')) {
+    Store.removeTxn(parseInt(e.target.parentElement.dataset.id));
+    UI.deleteTxn(e.target.parentElement);
 
     // Show message
     UI.showAlert('Transaction Removed!', 'success');
