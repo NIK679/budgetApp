@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="Skeleton-2.0.4/css/skeleton.css" />
+    <link rel="stylesheet" href="main.css" />
+    <link
+      rel="icon"
+      type="image/png"
+      href="Skeleton-2.0.4/images/favicon.png"
+    />
+    <title>Budget App</title>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Add Transaction</h1>
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Income</th>
+            <th>Expense</th>
+            <th>Balance</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th id="income-amt">0</th>
+            <th id="expense-amt">0</th>
+            <th id="balance-amt">0</th>
+          </tr>
+        </tbody>
+      </table>
+      <form id="txn-form">
+        <div>
+          <label for="type">Type</label>
+          <select id="type" class="u-full-width">
+            <option value="Income">Income</option>
+            <option value="Expense">Expense</option>
+          </select>
+        </div>
+        <div>
+          <label for="desc">Description</label>
+          <input type="text" id="desc" class="u-full-width" />
+        </div>
+        <div>
+          <label for="amt">Amount</label>
+          <input type="number" id="amt" class="u-full-width" />
+        </div>
+        <div>
+          <input type="submit" value="Submit" class="u-full-width" />
+        </div>
+      </form>
+      <table class="u-full-width">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Amount</th>
+            <th></th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="txn-list"></tbody>
+      </table>
+    </div>
+
+    <script src="app.js"></script>
+  </body>
+</html>
