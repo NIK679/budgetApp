@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/6.6.1/firebase-firestore.js"></script>
     <link rel="stylesheet" href="Skeleton-2.0.4/css/skeleton.css" />
     <link rel="stylesheet" href="main.css" />
     <link
@@ -73,7 +75,20 @@
         <tbody id="txn-list"></tbody>
       </table>
     </div>
-
+    <script>
+      // Your web app's Firebase configuration
+      var firebaseConfig = {
+        apiKey: "AIzaSyBMA-4hgw-z3o7_hQoBj0C52sBN1qenFaM",
+        authDomain: "budget-app-nik679.firebaseapp.com",
+        databaseURL: "https://budget-app-nik679.firebaseio.com",
+        projectId: "budget-app-nik679",
+        storageBucket: "budget-app-nik679.appspot.com",
+        messagingSenderId: "1036148540857",
+        appId: "1:1036148540857:web:8869e780be10e9c807a268"
+      };
+      // Initialize Firebase
+      firebase.initializeApp(firebaseConfig);
+    </script>
     <script src="app.js"></script>
   </body>
 </html>

@@ -1,27 +1,28 @@
+// eslint-disable-next-line no-undef
+const db = firebase.firestore();
 class Txn {
   constructor(type, desc, amt) {
     this.type = type;
     this.desc = desc;
     this.amt = amt;
-    this.id = Math.floor(Date.now() / 1000);
+    // this.id = Math.floor(Date.now() / 1000);
     // console.log(this);
   }
 }
 
 class UI {
-  static addTxnToList(txn) {
+  static addTxnToList(doc) {
     const list = document.getElementById('txn-list');
     // Create tr element
     const row = document.createElement('tr');
     // Insert cols
     row.innerHTML = `
-      <td>${txn.type}</td>
-      <td>${txn.desc}</td>
-      <td>${txn.amt}</td>
-      <td><a href="#" class="edit-txn" data-id="${txn.id}"><i class="fas fa-edit"></i><a></td>
-      <td><a href="#" class="delete-txn" data-id="${txn.id}"><i class="fas fa-trash"></i><a></td>
+      <td>${doc.data().type}</td>
+      <td>${doc.data().desc}</td>
+      <td>${doc.data().amt}</td>
+      <td><a href="#" class="edit-txn" data-id="${doc.id}"><i class="fas fa-edit"></i><a></td>
+      <td><a href="#" class="delete-txn" data-id="${doc.id}"><i class="fas fa-trash"></i><a></td>
     `;
-
     list.appendChild(row);
   }
 
@@ -45,22 +46,28 @@ class UI {
     }, 3000);
   }
 
-  static deleteTxn(target) {
-    if (target.className === 'delete-txn') {
-      target.parentElement.parentElement.remove();
-    }
-  }
+  // static deleteTxn(target) {
+  //   if (target.className === 'delete-txn') {
+  //     target.parentElement.parentElement.remove();
+  //   }
+  // }
 
-  static editTxn(target) {
-    if (target.className === 'edit-txn') {
-      target.parentElement.parentElement.remove();
-    }
-  }
+  // static editTxn(target) {
+  //   if (target.className === 'edit-txn') {
+  //     target.parentElement.parentElement.remove();
+  //   }
+  // }
 
   static clearFields() {
     document.getElementById('type').value = '';
     document.getElementById('desc').value = '';
     document.getElementById('amt').value = '';
+  }
+
+  static fillFields(doc) {
+    document.getElementById('type').value = doc.data().type;
+    document.getElementById('desc').value = doc.data().desc;
+    document.getElementById('amt').value = doc.data().amt;
   }
 }
 
@@ -78,44 +85,44 @@ class Store {
   }
 
   static displayTxns() {
-    const txns = Store.getTxns();
-    txns.forEach(txn => {
-      UI.addTxnToList(txn);
-    });
+    db.collection('txns')
+      .get()
+      .then(snapshot => {
+        snapshot.docs.forEach(doc => {
+          UI.addTxnToList(doc);
+        });
+      });
     Store.displayAmts();
   }
 
   static displayAmts() {
-    const txns = Store.getTxns();
     let income = 0;
     let expense = 0;
-    txns.forEach(txn => {
-      if (txn.type === 'Income') income += parseInt(txn.amt);
-      else expense += parseInt(txn.amt);
-    });
+    db.collection('txns')
+      .get()
+      .then(snapshot => {
+        snapshot.docs.forEach(doc => {
+          if (doc.data().type === 'Income') income += parseInt(doc.data().amt);
+          else expense += parseInt(doc.data().amt);
+        });
+      });
     document.getElementById('income-amt').textContent = income;
     document.getElementById('expense-amt').textContent = expense;
     document.getElementById('balance-amt').textContent = income - expense;
   }
 
   static addTxn(txn) {
-    const txns = Store.getTxns();
-
-    txns.push(txn);
-
-    localStorage.setItem('txns', JSON.stringify(txns));
+    db.collection('txns').add({
+      type: txn.type,
+      desc: txn.desc,
+      amt: txn.amt,
+    });
   }
 
   static removeTxn(id) {
-    const txns = Store.getTxns();
-
-    txns.forEach(function(txn, index) {
-      if (txn.id === id) {
-        txns.splice(index, 1);
-      }
-    });
-
-    localStorage.setItem('txns', JSON.stringify(txns));
+    db.collection('txns')
+      .doc(id)
+      .delete();
   }
 }
 
@@ -139,9 +146,6 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   } else if (amt <= 0) {
     UI.showAlert('Please enter a positive amount!', 'error');
   } else {
-    // Add txn to list
-    UI.addTxnToList(txn);
-
     // Add to LS
     Store.addTxn(txn);
 
@@ -160,21 +164,29 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
 // Event Listener for delete
 document.getElementById('txn-list').addEventListener('click', function(e) {
   if (e.target.parentElement.classList.contains('edit-txn')) {
-    const txns = Store.getTxns();
-    const txn = txns.filter(t => t.id === parseInt(e.target.parentElement.dataset.id));
     // Fill the form with saved values
-    document.getElementById('type').value = txn[0].type;
-    document.getElementById('desc').value = txn[0].desc;
-    document.getElementById('amt').value = txn[0].amt;
-    Store.removeTxn(parseInt(e.target.parentElement.dataset.id));
-    UI.editTxn(e.target.parentElement);
+    UI.fillFields(db.collection('txns').doc(e.target.parentElement.dataset.id));
+
+    Store.removeTxn(e.target.parentElement.dataset.id);
+    // UI.editTxn(e.target.parentElement);
   } else if (e.target.parentElement.classList.contains('delete-txn')) {
-    Store.removeTxn(parseInt(e.target.parentElement.dataset.id));
-    UI.deleteTxn(e.target.parentElement);
+    Store.removeTxn(e.target.parentElement.dataset.id);
+    // UI.deleteTxn(e.target.parentElement);
 
     // Show message
     UI.showAlert('Transaction Removed!', 'success');
   }
   Store.displayAmts();
   e.preventDefault();
+});
+
+db.collection('txns').onSnapshot(snapshot => {
+  snapshot.docChanges().forEach(change => {
+    if (change.type === 'added') {
+      UI.addTxnToList(change.doc);
+    } else if (change.type === 'removed') {
+      const td = document.querySelector(`[data-id="${change.doc.id}]`);
+      td.parentElement.remove();
+    }
+  });
 });
