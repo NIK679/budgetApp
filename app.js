@@ -1,5 +1,6 @@
 // eslint-disable-next-line no-undef
 const db = firebase.firestore();
+db.enablePersistence();
 class Txn {
   constructor(type, desc, amt) {
     this.type = type;
@@ -84,18 +85,20 @@ class Store {
     return txns;
   }
 
-  static displayTxns() {
-    db.collection('txns')
-      .get()
-      .then(snapshot => {
-        snapshot.docs.forEach(doc => {
-          UI.addTxnToList(doc);
-        });
-      });
-    Store.displayAmts();
-  }
+  // static displayTxns() {
+  //   db.collection('txns')
+  //     .get()
+  //     .then(snapshot => {
+  //       snapshot.docs.forEach(doc => {
+  //         UI.addTxnToList(doc);
+  //       });
+  //     });
+  //   console.log('displayTxns');
+  //   Store.displayAmts();
+  // }
 
   static displayAmts() {
+    console.log('displayAmts');
     let income = 0;
     let expense = 0;
     db.collection('txns')
@@ -127,7 +130,7 @@ class Store {
 }
 
 // DOM Load Event
-document.addEventListener('DOMContentLoaded', Store.displayTxns);
+// document.addEventListener('DOMContentLoaded', Store.displayTxns);
 
 // Event Listener for add txn
 document.getElementById('txn-form').addEventListener('submit', function(e) {
@@ -165,9 +168,14 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
 document.getElementById('txn-list').addEventListener('click', function(e) {
   if (e.target.parentElement.classList.contains('edit-txn')) {
     // Fill the form with saved values
-    UI.fillFields(db.collection('txns').doc(e.target.parentElement.dataset.id));
+    db.collection('txns')
+      .doc(e.target.parentElement.dataset.id)
+      .get()
+      .then(d => {
+        UI.fillFields(d);
+        Store.removeTxn(e.target.parentElement.dataset.id);
+      });
 
-    Store.removeTxn(e.target.parentElement.dataset.id);
     // UI.editTxn(e.target.parentElement);
   } else if (e.target.parentElement.classList.contains('delete-txn')) {
     Store.removeTxn(e.target.parentElement.dataset.id);
@@ -181,12 +189,12 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
 });
 
 db.collection('txns').onSnapshot(snapshot => {
+  console.log(snapshot.docChanges());
   snapshot.docChanges().forEach(change => {
     if (change.type === 'added') {
       UI.addTxnToList(change.doc);
     } else if (change.type === 'removed') {
-      const td = document.querySelector(`[data-id="${change.doc.id}]`);
-      td.parentElement.remove();
+      document.querySelector(`[data-id="${change.doc.id}"]`).parentElement.parentElement.remove();
     }
   });
 });
