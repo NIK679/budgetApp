@@ -1,6 +1,9 @@
 // eslint-disable-next-line no-undef
 const db = firebase.firestore();
 db.enablePersistence();
+
+let income = 0;
+let expense = 0;
 class Txn {
   constructor(type, desc, amt) {
     this.type = type;
@@ -98,17 +101,17 @@ class Store {
   // }
 
   static displayAmts() {
-    console.log('displayAmts');
-    let income = 0;
-    let expense = 0;
-    db.collection('txns')
-      .get()
-      .then(snapshot => {
-        snapshot.docs.forEach(doc => {
-          if (doc.data().type === 'Income') income += parseInt(doc.data().amt);
-          else expense += parseInt(doc.data().amt);
-        });
-      });
+    // console.log('displayAmts');
+    // let income = 0;
+    // let expense = 0;
+    // db.collection('txns')
+    //   .get()
+    //   .then(snapshot => {
+    //     snapshot.docs.forEach(doc => {
+    //       if (doc.data().type === 'Income') income += parseInt(doc.data().amt);
+    //       else expense += parseInt(doc.data().amt);
+    //     });
+    //   });
     document.getElementById('income-amt').textContent = income;
     document.getElementById('expense-amt').textContent = expense;
     document.getElementById('balance-amt').textContent = income - expense;
@@ -189,12 +192,17 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
 });
 
 db.collection('txns').onSnapshot(snapshot => {
-  console.log(snapshot.docChanges());
+  // console.log(snapshot.docChanges());
   snapshot.docChanges().forEach(change => {
     if (change.type === 'added') {
+      if (change.doc.data().type === 'Income') income += parseInt(change.doc.data().amt);
+      else expense += parseInt(change.doc.data().amt);
       UI.addTxnToList(change.doc);
     } else if (change.type === 'removed') {
+      if (change.doc.data().type === 'Income') income -= parseInt(change.doc.data().amt);
+      else expense -= parseInt(change.doc.data().amt);
       document.querySelector(`[data-id="${change.doc.id}"]`).parentElement.parentElement.remove();
     }
+    Store.displayAmts();
   });
 });
