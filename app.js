@@ -15,9 +15,7 @@ class Txn {
 class UI {
   static addTxnToList(doc) {
     const list = document.getElementById('txn-list');
-    // Create tr element
     const row = document.createElement('tr');
-    // Insert cols
     row.innerHTML = `
       <td>${doc.data().type}</td>
       <td>${doc.data().desc}</td>
@@ -41,7 +39,6 @@ class UI {
     const form = document.querySelector('#txn-form');
     // Insert alert
     container.insertBefore(div, form);
-
     // Timeout after 3 sec
     setTimeout(function() {
       document.querySelector('.alert').remove();
@@ -67,7 +64,7 @@ class UI {
   }
 }
 
-// Local Storage Class
+// Storage Class
 class Store {
   static addTxn(txn) {
     db.collection('txns').add({
@@ -84,41 +81,31 @@ class Store {
   }
 }
 
-// DOM Load Event
-// document.addEventListener('DOMContentLoaded', Store.displayTxns);
-
 // Event Listener for add txn
 document.getElementById('txn-form').addEventListener('submit', function(e) {
   // Get form values
   const type = document.getElementById('type').value;
   const desc = document.getElementById('desc').value;
   const amt = document.getElementById('amt').value;
-
   // Instantiate txn
   const txn = new Txn(type, desc, amt);
-
   // Validate
   if (type === '' || desc === '' || amt === '') {
-    // Error alert
     UI.showAlert('Please fill in all fields!', 'error');
   } else if (amt <= 0) {
     UI.showAlert('Please enter a positive amount!', 'error');
   } else {
     Store.addTxn(txn);
-
     // Show success
     UI.showAlert('Transaction Added!', 'success');
-
     // Clear fields
     UI.clearFields();
-
     // UI.displayAmts();
   }
-
   e.preventDefault();
 });
 
-// Event Listener for delete
+// Event Listener for edit/delete
 document.getElementById('txn-list').addEventListener('click', function(e) {
   if (e.target.parentElement.classList.contains('edit-txn')) {
     // Fill the form with saved values
