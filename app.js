@@ -9,8 +9,6 @@ class Txn {
     this.type = type;
     this.desc = desc;
     this.amt = amt;
-    // this.id = Math.floor(Date.now() / 1000);
-    // console.log(this);
   }
 }
 
@@ -50,18 +48,6 @@ class UI {
     }, 3000);
   }
 
-  // static deleteTxn(target) {
-  //   if (target.className === 'delete-txn') {
-  //     target.parentElement.parentElement.remove();
-  //   }
-  // }
-
-  // static editTxn(target) {
-  //   if (target.className === 'edit-txn') {
-  //     target.parentElement.parentElement.remove();
-  //   }
-  // }
-
   static clearFields() {
     document.getElementById('type').value = '';
     document.getElementById('desc').value = '';
@@ -73,50 +59,16 @@ class UI {
     document.getElementById('desc').value = doc.data().desc;
     document.getElementById('amt').value = doc.data().amt;
   }
-}
-
-// Local Storage Class
-class Store {
-  static getTxns() {
-    let txns;
-    if (localStorage.getItem('txns') === null) {
-      txns = [];
-    } else {
-      txns = JSON.parse(localStorage.getItem('txns'));
-    }
-
-    return txns;
-  }
-
-  // static displayTxns() {
-  //   db.collection('txns')
-  //     .get()
-  //     .then(snapshot => {
-  //       snapshot.docs.forEach(doc => {
-  //         UI.addTxnToList(doc);
-  //       });
-  //     });
-  //   console.log('displayTxns');
-  //   Store.displayAmts();
-  // }
 
   static displayAmts() {
-    // console.log('displayAmts');
-    // let income = 0;
-    // let expense = 0;
-    // db.collection('txns')
-    //   .get()
-    //   .then(snapshot => {
-    //     snapshot.docs.forEach(doc => {
-    //       if (doc.data().type === 'Income') income += parseInt(doc.data().amt);
-    //       else expense += parseInt(doc.data().amt);
-    //     });
-    //   });
     document.getElementById('income-amt').textContent = income;
     document.getElementById('expense-amt').textContent = expense;
     document.getElementById('balance-amt').textContent = income - expense;
   }
+}
 
+// Local Storage Class
+class Store {
   static addTxn(txn) {
     db.collection('txns').add({
       type: txn.type,
@@ -152,7 +104,6 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   } else if (amt <= 0) {
     UI.showAlert('Please enter a positive amount!', 'error');
   } else {
-    // Add to LS
     Store.addTxn(txn);
 
     // Show success
@@ -161,7 +112,7 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
     // Clear fields
     UI.clearFields();
 
-    Store.displayAmts();
+    // UI.displayAmts();
   }
 
   e.preventDefault();
@@ -178,31 +129,32 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
         UI.fillFields(d);
         Store.removeTxn(e.target.parentElement.dataset.id);
       });
-
-    // UI.editTxn(e.target.parentElement);
   } else if (e.target.parentElement.classList.contains('delete-txn')) {
     Store.removeTxn(e.target.parentElement.dataset.id);
-    // UI.deleteTxn(e.target.parentElement);
-
     // Show message
     UI.showAlert('Transaction Removed!', 'success');
   }
-  Store.displayAmts();
+  // UI.displayAmts();
   e.preventDefault();
 });
 
 db.collection('txns').onSnapshot(snapshot => {
-  // console.log(snapshot.docChanges());
   snapshot.docChanges().forEach(change => {
     if (change.type === 'added') {
-      if (change.doc.data().type === 'Income') income += parseInt(change.doc.data().amt);
-      else expense += parseInt(change.doc.data().amt);
+      if (change.doc.data().type === 'Income') {
+        income += parseInt(change.doc.data().amt);
+      } else {
+        expense += parseInt(change.doc.data().amt);
+      }
       UI.addTxnToList(change.doc);
     } else if (change.type === 'removed') {
-      if (change.doc.data().type === 'Income') income -= parseInt(change.doc.data().amt);
-      else expense -= parseInt(change.doc.data().amt);
+      if (change.doc.data().type === 'Income') {
+        income -= parseInt(change.doc.data().amt);
+      } else {
+        expense -= parseInt(change.doc.data().amt);
+      }
       document.querySelector(`[data-id="${change.doc.id}"]`).parentElement.parentElement.remove();
     }
-    Store.displayAmts();
+    UI.displayAmts();
   });
 });
