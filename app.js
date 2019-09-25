@@ -5,10 +5,11 @@ db.enablePersistence();
 let income = 0;
 let expense = 0;
 class Txn {
-  constructor(type, desc, amt) {
+  constructor(type, desc, amt, date) {
     this.type = type;
     this.desc = desc;
     this.amt = amt;
+    this.date = date !== '' ? new Date(date) : new Date();
   }
 }
 
@@ -20,6 +21,10 @@ class UI {
       <td>${doc.data().type}</td>
       <td>${doc.data().desc}</td>
       <td>${doc.data().amt}</td>
+      <td>${doc
+        .data()
+        .date.toDate()
+        .toDateString()}</td>
       <td><a href="#" class="edit-txn" data-id="${doc.id}"><i class="fas fa-edit"></i><a></td>
       <td><a href="#" class="delete-txn" data-id="${doc.id}"><i class="fas fa-trash"></i><a></td>
     `;
@@ -49,12 +54,14 @@ class UI {
     document.getElementById('type').value = '';
     document.getElementById('desc').value = '';
     document.getElementById('amt').value = '';
+    document.getElementById('date').value = '';
   }
 
   static fillFields(doc) {
     document.getElementById('type').value = doc.data().type;
     document.getElementById('desc').value = doc.data().desc;
     document.getElementById('amt').value = doc.data().amt;
+    document.getElementById('date').value = doc.data().date.toDate();
   }
 
   static displayAmts() {
@@ -71,6 +78,8 @@ class Store {
       type: txn.type,
       desc: txn.desc,
       amt: txn.amt,
+      // eslint-disable-next-line no-undef
+      date: firebase.firestore.Timestamp.fromDate(txn.date),
     });
   }
 
@@ -87,8 +96,9 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   const type = document.getElementById('type').value;
   const desc = document.getElementById('desc').value;
   const amt = document.getElementById('amt').value;
+  const date = document.getElementById('date').value;
   // Instantiate txn
-  const txn = new Txn(type, desc, amt);
+  const txn = new Txn(type, desc, amt, date);
   // Validate
   if (type === '' || desc === '' || amt === '') {
     UI.showAlert('Please fill in all fields!', 'error');
