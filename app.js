@@ -164,7 +164,9 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
   } else if (e.target.parentElement.classList.contains('delete-txn')) {
     Store.removeTxn(e.target.parentElement.dataset.id);
     // Show message
-    UI.showAlert('Transaction Removed!', 'success');
+    // eslint-disable-next-line no-undef
+    M.toast({ html: 'Transaction Removed!', classes: 'rounded green' });
+    // UI.showAlert('Transaction Removed!', 'success');
   }
   // UI.displayAmts();
   e.preventDefault();
