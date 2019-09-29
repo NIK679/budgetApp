@@ -16,39 +16,61 @@ class Txn {
 class UI {
   static addTxnToList(doc) {
     const list = document.getElementById('txn-list');
-    const row = document.createElement('tr');
-    row.innerHTML = `
-      <td>${doc.data().type}</td>
-      <td>${doc.data().desc}</td>
-      <td>${doc.data().amt}</td>
-      <td>${doc
-        .data()
-        .date.toDate()
-        .toDateString()}</td>
-      <td><a href="#" class="edit-txn" data-id="${doc.id}"><i class="fas fa-edit"></i><a></td>
-      <td><a href="#" class="delete-txn" data-id="${doc.id}"><i class="fas fa-trash"></i><a></td>
+    list.innerHTML += `
+    <div class="col s12 m6">
+    <div class="card-panel teal center-align">
+      <div class="row">
+        <div class="col s6">
+            <span class="white-text">${doc
+              .data()
+              .date.toDate()
+              .toDateString()}</span>
+        </div> 
+        <div class="col s4">
+            <span class="white-text">${doc.data().type}</span>
+        </div>
+        <div class="col s2 right">
+            <span><a href="#" class="edit-txn" data-id="${
+              doc.id
+            }"><i class="material-icons white-text">edit</i><a></span>
+        </div> 
+      </div>
+      <div class="row">
+        <div class="col s6">
+            <span class="white-text">${doc.data().desc}</span>
+        </div> 
+        <div class="col s4">
+            <span class="white-text">${doc.data().amt}</span>
+        </div>
+        <div class="col s2 right">
+            <span><a href="#" class="delete-txn" data-id="${
+              doc.id
+            }"><i class="material-icons white-text">delete</i><a></span>                  
+        </div> 
+      </div>
+    </div>
+    </div>
     `;
-    list.appendChild(row);
   }
 
-  static showAlert(message, className) {
-    // Create div
-    const div = document.createElement('div');
-    // Add classes
-    div.className = `alert ${className}`;
-    // Add text
-    div.appendChild(document.createTextNode(message));
-    // Get parent
-    const container = document.querySelector('.container');
-    // Get form
-    const form = document.querySelector('#txn-form');
-    // Insert alert
-    container.insertBefore(div, form);
-    // Timeout after 3 sec
-    setTimeout(function() {
-      document.querySelector('.alert').remove();
-    }, 3000);
-  }
+  // static showAlert(message, className) {
+  //   // Create div
+  //   const div = document.createElement('div');
+  //   // Add classes
+  //   div.className = `alert ${className}`;
+  //   // Add text
+  //   div.appendChild(document.createTextNode(message));
+  //   // Get parent
+  //   const container = document.querySelector('#div-form');
+  //   // Get form
+  //   const form = document.querySelector('#txn-form');
+  //   // Insert alert
+  //   container.insertBefore(div, form);
+  //   // Timeout after 3 sec
+  //   setTimeout(function() {
+  //     document.querySelector('.alert').remove();
+  //   }, 3000);
+  // }
 
   static clearFields() {
     document.getElementById('type').value = '';
@@ -61,7 +83,10 @@ class UI {
     document.getElementById('type').value = doc.data().type;
     document.getElementById('desc').value = doc.data().desc;
     document.getElementById('amt').value = doc.data().amt;
-    document.getElementById('date').value = doc.data().date.toDate();
+    document.getElementById('date').value = doc
+      .data()
+      .date.toDate()
+      .toDateString();
   }
 
   static displayAmts() {
@@ -90,6 +115,10 @@ class Store {
   }
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+  UI.clearFields();
+});
+
 // Event Listener for add txn
 document.getElementById('txn-form').addEventListener('submit', function(e) {
   // Get form values
@@ -101,13 +130,19 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   const txn = new Txn(type, desc, amt, date);
   // Validate
   if (type === '' || desc === '' || amt === '') {
-    UI.showAlert('Please fill in all fields!', 'error');
+    // eslint-disable-next-line no-undef
+    M.toast({ html: 'Please fill in all fields!', classes: 'rounded red' });
+    // UI.showAlert('Please fill in all fields!', 'error');
   } else if (amt <= 0) {
-    UI.showAlert('Please enter a positive amount!', 'error');
+    // eslint-disable-next-line no-undef
+    M.toast({ html: 'Please enter a positive amount!', classes: 'rounded red' });
+    // UI.showAlert('Please enter a positive amount!', 'error');
   } else {
     Store.addTxn(txn);
     // Show success
-    UI.showAlert('Transaction Added!', 'success');
+    // eslint-disable-next-line no-undef
+    M.toast({ html: 'Transaction Added!', classes: 'rounded green' });
+    // UI.showAlert('Transaction Added!', 'success');
     // Clear fields
     UI.clearFields();
     // UI.displayAmts();
@@ -150,7 +185,9 @@ db.collection('txns').onSnapshot(snapshot => {
       } else {
         expense -= parseInt(change.doc.data().amt);
       }
-      document.querySelector(`[data-id="${change.doc.id}"]`).parentElement.parentElement.remove();
+      document
+        .querySelector(`[data-id="${change.doc.id}"]`)
+        .parentElement.parentElement.parentElement.parentElement.parentElement.remove();
     }
     UI.displayAmts();
   });
