@@ -16,3 +16,11 @@
 .error {
   background: red;
 }
+
+#amt-row {
+  position: sticky;
+  top: 5px;
+  padding: 10px 0 0 0;
+  background: white;
+  z-index: 2;
+}
