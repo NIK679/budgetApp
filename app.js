@@ -1,7 +1,25 @@
-// eslint-disable-next-line no-undef
+/* eslint-disable no-undef */
+
 const db = firebase.firestore();
 db.enablePersistence();
 
+document.addEventListener('DOMContentLoaded', () => {
+  const elemsSelect = document.querySelectorAll('select');
+  // eslint-disable-next-line no-unused-vars
+  const instancesSelect = M.FormSelect.init(elemsSelect);
+  const elemsDatePicker = document.querySelectorAll('.datepicker');
+  // eslint-disable-next-line no-unused-vars
+  const instancesDatePicker = M.Datepicker.init(elemsDatePicker, {
+    showClearBtn: true,
+  });
+  const elemsTimePicker = document.querySelectorAll('.timepicker');
+  // eslint-disable-next-line no-unused-vars
+  const instancesTimePicker = M.Timepicker.init(elemsTimePicker, {
+    showClearBtn: true,
+  });
+});
+
+const list = [];
 let income = 0;
 let expense = 0;
 class Txn {
@@ -15,8 +33,8 @@ class Txn {
 
 class UI {
   static addTxnToList(doc) {
-    const list = document.getElementById('txn-list');
-    list.innerHTML += `
+    const txnList = document.getElementById('txn-list');
+    txnList.innerHTML += `
     <div class="col s12 m6">
     <div class="card-panel teal center-align">
       <div class="row">
@@ -77,6 +95,7 @@ class UI {
     document.getElementById('desc').value = '';
     document.getElementById('amt').value = '';
     document.getElementById('date').value = '';
+    document.getElementById('time').value = '';
   }
 
   static fillFields(doc) {
@@ -87,6 +106,10 @@ class UI {
       .data()
       .date.toDate()
       .toDateString();
+    document.getElementById('time').value = doc
+      .data()
+      .date.toDate()
+      .toTimeString();
   }
 
   static displayAmts() {
@@ -103,7 +126,7 @@ class Store {
       type: txn.type,
       desc: txn.desc,
       amt: txn.amt,
-      // eslint-disable-next-line no-undef
+
       date: firebase.firestore.Timestamp.fromDate(txn.date),
     });
   }
@@ -126,21 +149,21 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   const desc = document.getElementById('desc').value;
   const amt = document.getElementById('amt').value;
   const date = document.getElementById('date').value;
-  // Instantiate txn
-  const txn = new Txn(type, desc, amt, date);
+  const time = document.getElementById('time').value;
   // Validate
   if (type === '' || desc === '' || amt === '') {
-    // eslint-disable-next-line no-undef
     M.toast({ html: 'Please fill in all fields!', classes: 'rounded red' });
     // UI.showAlert('Please fill in all fields!', 'error');
   } else if (amt <= 0) {
-    // eslint-disable-next-line no-undef
     M.toast({ html: 'Please enter a positive amount!', classes: 'rounded red' });
     // UI.showAlert('Please enter a positive amount!', 'error');
+  } else if (date === '' && time !== '') {
+    M.toast({ html: 'Please choose a date!', classes: 'rounded red' });
   } else {
+    // Instantiate txn
+    const txn = new Txn(type, desc, amt, `${date} ${time}`);
     Store.addTxn(txn);
     // Show success
-    // eslint-disable-next-line no-undef
     M.toast({ html: 'Transaction Added!', classes: 'rounded green' });
     // UI.showAlert('Transaction Added!', 'success');
     // Clear fields
@@ -164,7 +187,7 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
   } else if (e.target.parentElement.classList.contains('delete-txn')) {
     Store.removeTxn(e.target.parentElement.dataset.id);
     // Show message
-    // eslint-disable-next-line no-undef
+
     M.toast({ html: 'Transaction Removed!', classes: 'rounded green' });
     // UI.showAlert('Transaction Removed!', 'success');
   }
@@ -175,6 +198,13 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
 db.collection('txns').onSnapshot(snapshot => {
   snapshot.docChanges().forEach(change => {
     if (change.type === 'added') {
+      list.push({
+        type: change.doc.data().type,
+        desc: change.doc.data().desc,
+        amt: change.doc.data().amt,
+        date: change.doc.data().date.toDate(),
+        id: change.doc.id,
+      });
       if (change.doc.data().type === 'Income') {
         income += parseInt(change.doc.data().amt);
       } else {

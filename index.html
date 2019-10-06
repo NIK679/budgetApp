@@ -75,9 +75,13 @@
             </div>
           </div>
           <div class="row">
-            <div class="input-field col s12">
+            <div class="input-field col s6">
               <input type="text" class="datepicker" id="date" />
               <label for="date">Date</label>
+            </div>
+            <div class="input-field col s6">
+              <input type="text" class="timepicker" id="time" />
+              <label for="time">Time</label>
             </div>
           </div>
           <div class="row">
@@ -113,7 +117,13 @@
         const elemsSelect = document.querySelectorAll("select");
         const instancesSelect = M.FormSelect.init(elemsSelect);
         const elemsDatePicker = document.querySelectorAll(".datepicker");
-        const instancesDatePicker = M.Datepicker.init(elemsDatePicker);
+        const instancesDatePicker = M.Datepicker.init(elemsDatePicker, {
+          showClearBtn: true
+        });
+        const elemsTimePicker = document.querySelectorAll(".timepicker");
+        const instancesTimePicker = M.Timepicker.init(elemsTimePicker, {
+          showClearBtn: true
+        });
       });
     </script>
     <script src="app.js"></script>
