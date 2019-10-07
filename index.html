@@ -96,7 +96,7 @@
     </div>
     <script>
       // Your web app's Firebase configuration
-      var firebaseConfig = {
+      const firebaseConfig = {
         apiKey: "AIzaSyBMA-4hgw-z3o7_hQoBj0C52sBN1qenFaM",
         authDomain: "budget-app-nik679.firebaseapp.com",
         databaseURL: "https://budget-app-nik679.firebaseio.com",
@@ -112,20 +112,6 @@
       type="text/javascript"
       src="materialize/js/materialize.min.js"
     ></script>
-    <script>
-      document.addEventListener("DOMContentLoaded", () => {
-        const elemsSelect = document.querySelectorAll("select");
-        const instancesSelect = M.FormSelect.init(elemsSelect);
-        const elemsDatePicker = document.querySelectorAll(".datepicker");
-        const instancesDatePicker = M.Datepicker.init(elemsDatePicker, {
-          showClearBtn: true
-        });
-        const elemsTimePicker = document.querySelectorAll(".timepicker");
-        const instancesTimePicker = M.Timepicker.init(elemsTimePicker, {
-          showClearBtn: true
-        });
-      });
-    </script>
     <script src="app.js"></script>
   </body>
 </html>
