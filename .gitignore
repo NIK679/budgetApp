@@ -2,3 +2,4 @@ node_modules
 6-budgety
 package-lock.json
 .idea
+.vscode
