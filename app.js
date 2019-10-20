@@ -192,7 +192,7 @@ db.collection('txns').onSnapshot(snapshot => {
     } else if (change.type === 'removed') {
       list = list.filter(txn => txn.id !== change.doc.id);
     }
-    list.sort((a, b) => a.date > b.date);
+    list.sort((a, b) => b.date - a.date);
     UI.displayList();
   });
 });
