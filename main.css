@@ -1,8 +1,9 @@
 /* body {
-  background: white;
+  background: rgb(18, 18, 18);
+  color: rgb(240, 240, 240);
 } */
 
-.success,
+/* .success,
 .error {
   color: white;
   padding: 5px;
@@ -15,13 +16,13 @@
 
 .error {
   background: red;
-}
+} */
 
 #amt-row {
   position: sticky;
   top: 0px;
   margin: 0;
   padding: 10px 0 0 0;
-  background: white;
+  background: rgba(255, 255, 255, 0);
   z-index: 2;
 }

@@ -20,8 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 const list = [];
-let income = 0;
-let expense = 0;
+
 class Txn {
   constructor(type, desc, amt, date) {
     this.type = type;
@@ -32,63 +31,93 @@ class Txn {
 }
 
 class UI {
-  static addTxnToList(doc) {
-    const txnList = document.getElementById('txn-list');
-    txnList.innerHTML += `
-    <div class="col s12 m6">
-    <div class="card-panel teal center-align">
-      <div class="row">
-        <div class="col s6">
-            <span class="white-text">${doc
-              .data()
-              .date.toDate()
-              .toDateString()}</span>
-        </div> 
-        <div class="col s4">
-            <span class="white-text">${doc.data().type}</span>
-        </div>
-        <div class="col s2 right">
-            <span><a href="#" class="edit-txn" data-id="${
-              doc.id
-            }"><i class="material-icons white-text">edit</i><a></span>
-        </div> 
-      </div>
-      <div class="row">
-        <div class="col s6">
-            <span class="white-text">${doc.data().desc}</span>
-        </div> 
-        <div class="col s4">
-            <span class="white-text">${doc.data().amt}</span>
-        </div>
-        <div class="col s2 right">
-            <span><a href="#" class="delete-txn" data-id="${
-              doc.id
-            }"><i class="material-icons white-text">delete</i><a></span>                  
-        </div> 
-      </div>
-    </div>
-    </div>
-    `;
-  }
-
-  // static showAlert(message, className) {
-  //   // Create div
-  //   const div = document.createElement('div');
-  //   // Add classes
-  //   div.className = `alert ${className}`;
-  //   // Add text
-  //   div.appendChild(document.createTextNode(message));
-  //   // Get parent
-  //   const container = document.querySelector('#div-form');
-  //   // Get form
-  //   const form = document.querySelector('#txn-form');
-  //   // Insert alert
-  //   container.insertBefore(div, form);
-  //   // Timeout after 3 sec
-  //   setTimeout(function() {
-  //     document.querySelector('.alert').remove();
-  //   }, 3000);
+  // static addTxnToList(doc) {
+  //   const txnList = document.getElementById('txn-list');
+  //   txnList.innerHTML += `
+  //   <div class="col s12 m6">
+  //   <div class="card-panel teal center-align">
+  //     <div class="row">
+  //       <div class="col s6">
+  //           <span class="white-text">${doc
+  //             .data()
+  //             .date.toDate()
+  //             .toDateString()}</span>
+  //       </div>
+  //       <div class="col s4">
+  //           <span class="white-text">${doc.data().type}</span>
+  //       </div>
+  //       <div class="col s2 right">
+  //           <span><a href="#" class="edit-txn" data-id="${
+  //             doc.id
+  //           }"><i class="material-icons white-text">edit</i><a></span>
+  //       </div>
+  //     </div>
+  //     <div class="row">
+  //       <div class="col s6">
+  //           <span class="white-text">${doc.data().desc}</span>
+  //       </div>
+  //       <div class="col s4">
+  //           <span class="white-text">${doc.data().amt}</span>
+  //       </div>
+  //       <div class="col s2 right">
+  //           <span><a href="#" class="delete-txn" data-id="${
+  //             doc.id
+  //           }"><i class="material-icons white-text">delete</i><a></span>
+  //       </div>
+  //     </div>
+  //   </div>
+  //   </div>
+  //   `;
   // }
+
+  static displayList() {
+    let income = 0;
+    let expense = 0;
+    const txnList = document.getElementById('txn-list');
+    txnList.innerHTML = '';
+    list.forEach(txn => {
+      txnList.innerHTML += `
+      <div class="col s12 m6">
+      <div class="card-panel teal center-align">
+        <div class="row">
+          <div class="col s6">
+              <span class="white-text">${txn.date.toDateString()}</span>
+          </div> 
+          <div class="col s4">
+              <span class="white-text">${txn.type}</span>
+          </div>
+          <div class="col s2 right">
+              <span><a href="#" class="edit-txn" data-id="${
+                txn.id
+              }"><i class="material-icons white-text">edit</i><a></span>
+          </div> 
+        </div>
+        <div class="row">
+          <div class="col s6">
+              <span class="white-text">${txn.desc}</span>
+          </div> 
+          <div class="col s4">
+              <span class="white-text">${txn.amt}</span>
+          </div>
+          <div class="col s2 right">
+              <span><a href="#" class="delete-txn" data-id="${
+                txn.id
+              }"><i class="material-icons white-text">delete</i><a></span>                  
+          </div> 
+        </div>
+      </div>
+      </div>
+      `;
+      if (txn.type === 'Income') {
+        income += parseInt(txn.amt);
+      } else {
+        expense += parseInt(txn.amt);
+      }
+    });
+    document.getElementById('income-amt').textContent = income;
+    document.getElementById('expense-amt').textContent = expense;
+    document.getElementById('balance-amt').textContent = income - expense;
+  }
 
   static clearFields() {
     document.getElementById('type').value = '';
@@ -111,12 +140,6 @@ class UI {
       .date.toDate()
       .toTimeString();
   }
-
-  static displayAmts() {
-    document.getElementById('income-amt').textContent = income;
-    document.getElementById('expense-amt').textContent = expense;
-    document.getElementById('balance-amt').textContent = income - expense;
-  }
 }
 
 // Storage Class
@@ -126,7 +149,6 @@ class Store {
       type: txn.type,
       desc: txn.desc,
       amt: txn.amt,
-
       date: firebase.firestore.Timestamp.fromDate(txn.date),
     });
   }
@@ -205,22 +227,11 @@ db.collection('txns').onSnapshot(snapshot => {
         date: change.doc.data().date.toDate(),
         id: change.doc.id,
       });
-      if (change.doc.data().type === 'Income') {
-        income += parseInt(change.doc.data().amt);
-      } else {
-        expense += parseInt(change.doc.data().amt);
-      }
-      UI.addTxnToList(change.doc);
     } else if (change.type === 'removed') {
-      if (change.doc.data().type === 'Income') {
-        income -= parseInt(change.doc.data().amt);
-      } else {
-        expense -= parseInt(change.doc.data().amt);
-      }
       document
         .querySelector(`[data-id="${change.doc.id}"]`)
         .parentElement.parentElement.parentElement.parentElement.parentElement.remove();
     }
-    UI.displayAmts();
+    UI.displayList();
   });
 });
