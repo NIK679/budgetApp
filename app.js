@@ -21,15 +21,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 let list = [];
 
-class Txn {
-  constructor(type, desc, amt, date) {
-    this.type = type;
-    this.desc = desc;
-    this.amt = amt;
-    this.date = date;
-  }
-}
-
 class UI {
   static displayList() {
     let income = 0;
@@ -117,12 +108,12 @@ class UI {
 
 // Storage Class
 class Store {
-  static addTxn(txn) {
+  static addTxn(type, desc, amt, date) {
     db.collection('txns').add({
-      type: txn.type,
-      desc: txn.desc,
-      amt: txn.amt,
-      date: firebase.firestore.Timestamp.fromDate(txn.date),
+      type,
+      desc,
+      amt,
+      date: firebase.firestore.Timestamp.fromDate(date),
     });
   }
 
@@ -157,8 +148,7 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   } else {
     const newDate = date === '' ? new Date() : new Date(`${date} ${time}`);
     // Instantiate txn
-    const txn = new Txn(type, desc, amt, newDate);
-    Store.addTxn(txn);
+    Store.addTxn(type, desc, amt, newDate);
     // Show success
     M.toast({ html: 'Transaction Added!', classes: 'rounded green' });
     // UI.showAlert('Transaction Added!', 'success');
@@ -183,7 +173,6 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
   } else if (e.target.parentElement.classList.contains('delete-txn')) {
     Store.removeTxn(e.target.parentElement.dataset.id);
     // Show message
-
     M.toast({ html: 'Transaction Removed!', classes: 'rounded green' });
     // UI.showAlert('Transaction Removed!', 'success');
   }
