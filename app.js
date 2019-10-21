@@ -35,17 +35,17 @@ class UI {
       <div class="divider"></div>
         <div class="row">
           <br/>
-          <div class="col s6">
+          <div class="col s7">
             <span>${list[i].date.toDateString()}</span>
           </div> 
-          <div class="col s6" id="daily-bal-${j}">
+          <div class="col s5" id="daily-bal-${j}">
             <span>0</span>
           </div>
         </div>`;
       do {
         txnList.innerHTML += `
         <div class="row">
-          <div class="col s6">
+          <div class="col s7">
             <span class="">${list[i].desc}</span>
           </div> 
           <div class="col s3 ${list[i].type === 'Income' ? 'green-text' : 'red-text'}">
@@ -54,11 +54,11 @@ class UI {
           </div>
           <div class="col s1">
             <span><a href="#" class="edit-txn" data-id="${list[i].id}">
-              <i class="material-icons ">edit</i><a></span>
+              <i class="material-icons tiny green-text">edit</i><a></span>
           </div>
-          <div class="col s2">
+          <div class="col s1">
             <span><a href="#" class="delete-txn" data-id="${list[i].id}">
-              <i class="material-icons ">delete</i><a></span>
+              <i class="material-icons tiny red-text">delete</i><a></span>
           </div> 
         </div>`;
         if (list[i].type === 'Income') {
@@ -75,7 +75,6 @@ class UI {
         i += 1;
       } while (i < list.length && list[i - 1].date.toDateString() === list[i].date.toDateString());
       txnList.innerHTML += `
-      <div class="divider"></div>
       </div>`;
     }
     document.getElementById('income-amt').textContent = income;
