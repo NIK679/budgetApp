@@ -36,45 +36,46 @@ class UI {
     let expense = 0;
     const txnList = document.getElementById('txn-list');
     txnList.innerHTML = '';
-    list.forEach(txn => {
+    for (let i = 0; i < list.length; i += 1) {
       txnList.innerHTML += `
-      <div class="col s12 m6">
-      <div class="card-panel teal center-align">
-        <div class="row">
-          <div class="col s6">
-              <span class="white-text">${txn.date.toDateString()}</span>
-          </div> 
-          <div class="col s4">
-              <span class="white-text">${txn.type}</span>
-          </div>
-          <div class="col s2 right">
-              <span><a href="#" class="edit-txn" data-id="${
-                txn.id
-              }"><i class="material-icons white-text">edit</i><a></span>
-          </div> 
-        </div>
-        <div class="row">
-          <div class="col s6">
-              <span class="white-text">${txn.desc}</span>
-          </div> 
-          <div class="col s4">
-              <span class="white-text">${txn.amt}</span>
-          </div>
-          <div class="col s2 right">
-              <span><a href="#" class="delete-txn" data-id="${
-                txn.id
-              }"><i class="material-icons white-text">delete</i><a></span>                  
-          </div> 
-        </div>
-      </div>
-      </div>
-      `;
-      if (txn.type === 'Income') {
-        income += parseInt(txn.amt);
-      } else {
-        expense += parseInt(txn.amt);
+      ${list[i - 1].date.toDateString() !== list[i].date.toDateString() ? `</div></div>` : ''}
+      ${
+        i === 0 || list[i - 1].date.toDateString() !== list[i].date.toDateString()
+          ? `<div class="col s12 m6">
+              <div class="card-panel teal center-align">
+                <div class="row">
+                  <div class="col s6">
+                    <span class="white-text">${list[i].date.toDateString()}</span>
+                  </div> 
+                </div>`
+          : ''
       }
-    });
+        <div class="row">
+          <div class="col s4">
+            <span class="white-text">${list[i].desc}</span>
+          </div> 
+          <div class="col s4 white-text">
+            <span >${list[i].type === 'Income' ? '+' : '-'}</span>
+            <span >${list[i].amt}</span>
+          </div>
+          
+          <div class="col s2">
+            <span><a href="#" class="edit-txn">
+              <i class="material-icons white-text">edit</i><a></span>
+          </div>
+          <div class="col s2">
+            <span><a href="#" class="delete-txn">
+              <i class="material-icons white-text">delete</i><a></span>                  
+          </div> 
+        </div>
+      ${/* i === list.length - 1 || list[i].date.toDateString() !== list[i + 1].date.toDateString() ? `</div></div>` : '' */}
+      `;
+      if (list[i].type === 'Income') {
+        income += parseInt(list[i].amt);
+      } else {
+        expense += parseInt(list[i].amt);
+      }
+    }
     document.getElementById('income-amt').textContent = income;
     document.getElementById('expense-amt').textContent = expense;
     document.getElementById('balance-amt').textContent = income - expense;
