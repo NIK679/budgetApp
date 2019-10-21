@@ -38,18 +38,13 @@ class UI {
     txnList.innerHTML = '';
     for (let i = 0; i < list.length; i += 1) {
       txnList.innerHTML += `
-      ${list[i - 1].date.toDateString() !== list[i].date.toDateString() ? `</div></div>` : ''}
-      ${
-        i === 0 || list[i - 1].date.toDateString() !== list[i].date.toDateString()
-          ? `<div class="col s12 m6">
+      <div class="col s12 m6">
               <div class="card-panel teal center-align">
                 <div class="row">
                   <div class="col s6">
                     <span class="white-text">${list[i].date.toDateString()}</span>
                   </div> 
-                </div>`
-          : ''
-      }
+                </div>
         <div class="row">
           <div class="col s4">
             <span class="white-text">${list[i].desc}</span>
@@ -68,7 +63,6 @@ class UI {
               <i class="material-icons white-text">delete</i><a></span>                  
           </div> 
         </div>
-      ${/* i === list.length - 1 || list[i].date.toDateString() !== list[i + 1].date.toDateString() ? `</div></div>` : '' */}
       `;
       if (list[i].type === 'Income') {
         income += parseInt(list[i].amt);
