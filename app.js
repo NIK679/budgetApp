@@ -39,30 +39,32 @@ class UI {
     for (let i = 0; i < list.length; i += 1) {
       txnList.innerHTML += `
       <div class="col s12 m6">
-              <div class="card-panel teal center-align">
-                <div class="row">
-                  <div class="col s6">
-                    <span class="white-text">${list[i].date.toDateString()}</span>
-                  </div> 
-                </div>
+      <div class="divider"></div>
         <div class="row">
-          <div class="col s4">
-            <span class="white-text">${list[i].desc}</span>
+          <br/>
+          <div class="col s6">
+            <span class="">${list[i].date.toDateString()}</span>
           </div> 
-          <div class="col s4 white-text">
+        </div>
+        <div class="row">
+          <div class="col s6">
+            <span class="">${list[i].desc}</span>
+          </div> 
+          <div class="col s3 ${list[i].type === 'Income' ? 'green-text' : 'red-text'}">
             <span >${list[i].type === 'Income' ? '+' : '-'}</span>
             <span >${list[i].amt}</span>
           </div>
-          
-          <div class="col s2">
-            <span><a href="#" class="edit-txn">
-              <i class="material-icons white-text">edit</i><a></span>
+          <div class="col s1">
+            <span><a href="#" class="edit-txn" data-id="${list[i].id}">
+              <i class="material-icons ">edit</i><a></span>
           </div>
           <div class="col s2">
-            <span><a href="#" class="delete-txn">
-              <i class="material-icons white-text">delete</i><a></span>                  
+            <span><a href="#" class="delete-txn" data-id="${list[i].id}">
+              <i class="material-icons ">delete</i><a></span>
           </div> 
         </div>
+      <div class="divider"></div>
+      </div>
       `;
       if (list[i].type === 'Income') {
         income += parseInt(list[i].amt);
