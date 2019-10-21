@@ -36,16 +36,23 @@ class UI {
     let expense = 0;
     const txnList = document.getElementById('txn-list');
     txnList.innerHTML = '';
-    for (let i = 0; i < list.length; i += 1) {
+    for (let i = 0; i < list.length; ) {
+      const j = i;
+      let dBal = 0;
       txnList.innerHTML += `
       <div class="col s12 m6">
       <div class="divider"></div>
         <div class="row">
           <br/>
           <div class="col s6">
-            <span class="">${list[i].date.toDateString()}</span>
+            <span>${list[i].date.toDateString()}</span>
           </div> 
-        </div>
+          <div class="col s6" id="daily-bal-${j}">
+            <span>0</span>
+          </div>
+        </div>`;
+      do {
+        txnList.innerHTML += `
         <div class="row">
           <div class="col s6">
             <span class="">${list[i].desc}</span>
@@ -62,15 +69,23 @@ class UI {
             <span><a href="#" class="delete-txn" data-id="${list[i].id}">
               <i class="material-icons ">delete</i><a></span>
           </div> 
-        </div>
+        </div>`;
+        if (list[i].type === 'Income') {
+          income += parseInt(list[i].amt);
+          dBal += parseInt(list[i].amt);
+        } else {
+          expense += parseInt(list[i].amt);
+          dBal -= parseInt(list[i].amt);
+        }
+        const dailyBal = document.querySelector(`#daily-bal-${j}`);
+        dailyBal.innerHTML = `
+        <span class="${dBal >= 0 ? 'blue-text' : 'red-text'}">${Math.abs(dBal)}
+        </span>`;
+        i += 1;
+      } while (i < list.length && list[i - 1].date.toDateString() === list[i].date.toDateString());
+      txnList.innerHTML += `
       <div class="divider"></div>
-      </div>
-      `;
-      if (list[i].type === 'Income') {
-        income += parseInt(list[i].amt);
-      } else {
-        expense += parseInt(list[i].amt);
-      }
+      </div>`;
     }
     document.getElementById('income-amt').textContent = income;
     document.getElementById('expense-amt').textContent = expense;
