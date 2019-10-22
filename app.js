@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
   const instancesTimePicker = M.Timepicker.init(elemsTimePicker, {
     showClearBtn: true,
   });
+  const elemsFAB = document.querySelectorAll('.fixed-action-btn');
+  // eslint-disable-next-line no-unused-vars
+  const instances = M.FloatingActionButton.init(elemsFAB, {
+    hoverEnabled: false,
+  });
 });
 
 let list = [];
@@ -31,7 +36,6 @@ class UI {
       const j = i;
       let dBal = 0;
       txnList.innerHTML += `
-      <div class="col s12 m6">
       <div class="divider"></div>
         <div class="row">
           <br/>
@@ -74,8 +78,6 @@ class UI {
         </span>`;
         i += 1;
       } while (i < list.length && list[i - 1].date.toDateString() === list[i].date.toDateString());
-      txnList.innerHTML += `
-      </div>`;
     }
     document.getElementById('income-amt').textContent = income;
     document.getElementById('expense-amt').textContent = expense;
@@ -102,6 +104,7 @@ class UI {
       .data()
       .date.toDate()
       .toTimeString();
+    M.updateTextFields();
   }
 }
 
@@ -123,12 +126,8 @@ class Store {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  UI.clearFields();
-});
-
 // Event Listener for add txn
-document.getElementById('txn-form').addEventListener('submit', function(e) {
+document.getElementById('txn-form').addEventListener('submit', e => {
   // Get form values
   const type = document.getElementById('type').value;
   const desc = document.getElementById('desc').value;
@@ -138,28 +137,23 @@ document.getElementById('txn-form').addEventListener('submit', function(e) {
   // Validate
   if (type === '' || desc === '' || amt === '') {
     M.toast({ html: 'Please fill in all fields!', classes: 'rounded red' });
-    // UI.showAlert('Please fill in all fields!', 'error');
   } else if (amt <= 0) {
     M.toast({ html: 'Please enter a positive amount!', classes: 'rounded red' });
-    // UI.showAlert('Please enter a positive amount!', 'error');
   } else if (date === '' && time !== '') {
     M.toast({ html: 'Please choose a date!', classes: 'rounded red' });
   } else {
     const newDate = date === '' ? new Date() : new Date(`${date} ${time}`);
-    // Instantiate txn
     Store.addTxn(type, desc, amt, newDate);
     // Show success
     M.toast({ html: 'Transaction Added!', classes: 'rounded green' });
-    // UI.showAlert('Transaction Added!', 'success');
     // Clear fields
     UI.clearFields();
-    // UI.displayAmts();
   }
   e.preventDefault();
 });
 
 // Event Listener for edit/delete
-document.getElementById('txn-list').addEventListener('click', function(e) {
+document.getElementById('txn-list').addEventListener('click', e => {
   if (e.target.parentElement.classList.contains('edit-txn')) {
     // Fill the form with saved values
     db.collection('txns')
@@ -176,6 +170,49 @@ document.getElementById('txn-list').addEventListener('click', function(e) {
     // UI.showAlert('Transaction Removed!', 'success');
   }
   // UI.displayAmts();
+  e.preventDefault();
+});
+
+document.getElementById('display-txn-form').addEventListener('click', e => {
+  txnForm = document.getElementById('txn-form');
+  txnForm.innerHTML = `
+  <div class="row">
+  <div class="input-field col s12">
+    <select class="browser-default" id="type">
+      <option value="" disabled selected>Choose your option</option>
+      <option value="Expense">Expense</option>
+      <option value="Income">Income</option>
+    </select>
+    <label class="active" for="type">Type</label>
+  </div>
+</div>
+<div class="row">
+  <div class="input-field col s12">
+    <input type="text" id="desc" />
+    <label for="desc">Description</label>
+  </div>
+</div>
+<div class="row">
+  <div class="input-field col s12">
+    <input type="number" id="amt" />
+    <label for="amt">Amount</label>
+  </div>
+</div>
+<div class="row">
+  <div class="input-field col s6">
+    <input class="browser-default" type="date" id="date" />
+    <label class="active" for="date">Date</label>
+  </div>
+  <div class="input-field col s6">
+    <input class="browser-default" type="time" id="time" />
+    <label class="active" for="time">Time</label>
+  </div>
+</div>
+<div class="row">
+  <div class="input-field col s12">
+    <input type="submit" value="Submit" class="btn btn-large" />
+  </div>
+</div>`;
   e.preventDefault();
 });
 
