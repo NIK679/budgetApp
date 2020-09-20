@@ -31,7 +31,7 @@ class UI {
       const j = i;
       let dBal = 0;
       txnList.innerHTML += `
-      <div class="col s12 m6">
+      <div class="col s12">
       <div class="divider"></div>
         <div class="row">
           <br/>
